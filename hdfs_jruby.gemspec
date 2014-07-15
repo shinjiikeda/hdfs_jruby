@@ -5,7 +5,7 @@ require 'hdfs_jruby/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "hdfs_jruby"
-  spec.version       = HdfsJruby::VERSION
+  spec.version       = Hdfs::VERSION
   spec.authors       = ["shinji ikeda"]
   spec.email         = ["gm.ikeda@gmail.com"]
   spec.summary       = %q{ jruby hdfs api}

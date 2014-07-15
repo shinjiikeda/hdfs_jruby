@@ -1,4 +1,4 @@
-1
+
 require "hdfs_jruby/version"
 
 module Hdfs
