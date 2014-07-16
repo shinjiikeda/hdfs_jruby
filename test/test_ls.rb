@@ -1,19 +1,16 @@
 
 require 'hdfs_jruby'
 
+Hdfs.list(ARGV[0], true) do | stat |
+  p stat
+  path = stat['path']
+  length = stat['length']
+  type = stat['type']
+  owner = stat['owner']
+  group = stat['group']
+  mtime = stat['modificationTime']
 
-
-list = Hdfs.ls(ARGV[0])
-
-list.each do | f |
-  path = f.getPath.to_s
-  size = f.getLen.to_i
-  is_dir = f.isDir
-  owner = f.getOwner
-  group = f.getGroup
-  mtime = f.getModificationTime()
-
-  print "#{is_dir ? "d" : "f"} #{path} #{size} #{owner}:#{group} #{mtime}\n"
+  print "#{type == "DIRECTORY"  ? "d" : "f"} #{path} #{length} #{owner}:#{group} #{mtime}\n"
 end
 
 

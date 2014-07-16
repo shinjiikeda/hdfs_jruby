@@ -36,10 +36,30 @@ module Hdfs
   @conf = Hdfs::Configuration.new()
   @fs = Hdfs::FileSystem.get(@conf)
 
-  #def ls(path)
-  #  p = _path(path)
-  #  @fs.globStatus(p)
-  #end
+  def list(path, use_glob=true)
+    p = _path(path)
+    if ! block_given?
+      raise "error"
+    else
+      list = nil
+      if use_glob
+        list = @fs.globStatus(p)
+      else
+        list = @fs.listStatus(p)
+      end
+      list.each do | stat |
+        file_info = {}
+        file_info['path'] = stat.getPath.to_s
+        file_info['length'] = stat.getLen.to_i
+        file_info['modificationTime'] = stat.getModificationTime.to_i
+        file_info['owner'] = stat.getOwner.to_s
+        file_info['group'] = stat.getGroup.to_s
+        file_info['permission'] = stat.getPermission.toShort.to_i
+        file_info['type'] = !stat.isDir ? 'FILE': 'DIRECTORY'
+        yield file_info
+      end
+    end
+  end
   
   def exists?(path)
     @fs.exists(_path(path))
@@ -105,7 +125,7 @@ module Hdfs
   module_function :get_working_directory
   module_function :set_working_directory
   module_function :set_permission
-  #module_function :ls
+  module_function :list
 
   private
   def _path(path)
