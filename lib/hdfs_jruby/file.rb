@@ -31,7 +31,11 @@ module Hdfs
     end
     
     def self.open(path, mode = "r")
-      return File.new(path, mode).to_io
+      if block_given?
+        yield(File.new(path, mode).to_io)
+      else
+        return File.new(path, mode).to_io
+      end
     end
     
     def syswrite(str)
@@ -49,8 +53,9 @@ module Hdfs
       outbuf << java.lang.String.new(buf, 0, n).to_s
     end
     
-    def seek(offset)
+    def seek(offset, whence = IO::SEEK_SET)
       @stream.seek(offset)
+      0
     end
     
     def close
