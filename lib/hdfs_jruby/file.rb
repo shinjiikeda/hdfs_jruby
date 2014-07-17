@@ -48,12 +48,15 @@ module Hdfs
       end
       outbuf << java.lang.String.new(buf, 0, n).to_s
     end
-
+    
+    def seek(offset)
+      @stream.seek(offset)
+    end
+    
     def close
       @stream.close
       @fs.close
     end
-    
 
     def __getobj__
       @stream

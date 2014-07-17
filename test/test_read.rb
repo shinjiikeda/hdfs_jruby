@@ -6,6 +6,8 @@ require 'hdfs_jruby/file'
 #f.close
 
 
-Hdfs::File.open("test.txt", "r").each do | line |
-print line
+file = ARGV[0]
+
+Hdfs::File.open(file, "r").each do | line |
+  print line
 end

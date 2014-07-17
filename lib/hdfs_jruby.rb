@@ -112,7 +112,11 @@ module Hdfs
   def set_permission(path, perm)
     @fs.setPermission(_path(path), org.apache.hadoop.fs.permission.FsPermission.new(perm))
   end
-
+  
+  def set_owner(path, owner, group)
+    @fs.setOwner(_path(path), owner, group)
+  end
+  
   module_function :exists?
   module_function :move
   module_function :delete
@@ -125,6 +129,7 @@ module Hdfs
   module_function :get_working_directory
   module_function :set_working_directory
   module_function :set_permission
+  module_function :set_owner
   module_function :list
 
   private
