@@ -119,6 +119,7 @@ module Hdfs
   
   module_function :exists?
   module_function :move
+  module_function :mkdir
   module_function :delete
   module_function :file?
   module_function :directory?
