@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["gm.ikeda@gmail.com"]
   spec.summary       = %q{ jruby hdfs api}
   spec.description   = %q{}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/shinjiikeda/hdfs_jruby"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
