@@ -16,7 +16,6 @@ module Hdfs
         @stream = @fs.create(Hdfs::Path.new(path), false)
       elsif mode == "r"
         @stream = @fs.open(Hdfs::Path.new(path))
-        @buf = java.nio.ByteBuffer.allocate(65536)
       elsif mode == "a"
         p = Hdfs::Path.new(path)
         if !@fs.exists(p)
@@ -32,7 +31,12 @@ module Hdfs
     
     def self.open(path, mode = "r")
       if block_given?
-        yield(File.new(path, mode).to_io)
+        io = File.new(path, mode).to_io
+        begin
+          yield(io)
+        ensure
+          io.close
+        end
       else
         return File.new(path, mode).to_io
       end

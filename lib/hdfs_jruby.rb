@@ -35,28 +35,52 @@ module Hdfs
   
   @conf = Hdfs::Configuration.new()
   @fs = Hdfs::FileSystem.get(@conf)
-
-  def list(path, use_glob=true)
+  
+  def ls(path)
     p = _path(path)
-    if ! block_given?
-      raise "error"
-    else
-      list = nil
-      if use_glob
-        list = @fs.globStatus(p)
+    list = @fs.globStatus(p)
+    ret_list = []
+    list.each do |stat|
+      if stat.isDir
+        sub_list = @fs.listStatus(stat.getPath)
+        sub_list.each do | s |
+          if block_given?
+            yield _conv(s)
+          else
+            ret_list << _conv(s)
+          end
+        end
       else
-        list = @fs.listStatus(p)
+        if block_given?
+          yield _conv(stat)
+        else
+          ret_list << _conv(stat)
+        end
       end
+    end
+    ret_list if ! block_given?
+  end
+
+  def list(path, opts={})
+    use_glob = opts[:glob] ? true : false
+    p = _path(path)
+
+    list = nil
+    if use_glob
+      list = @fs.globStatus(p)
+    else
+      list = @fs.listStatus(p)
+    end
+      
+    if ! block_given?
+      ret_list = []
       list.each do | stat |
-        file_info = {}
-        file_info['path'] = stat.getPath.to_s
-        file_info['length'] = stat.getLen.to_i
-        file_info['modificationTime'] = stat.getModificationTime.to_i
-        file_info['owner'] = stat.getOwner.to_s
-        file_info['group'] = stat.getGroup.to_s
-        file_info['permission'] = stat.getPermission.toShort.to_i
-        file_info['type'] = !stat.isDir ? 'FILE': 'DIRECTORY'
-        yield file_info
+        ret_list << _conv(stat)
+      end
+      return ret_list
+    else
+      list.each do | stat |
+        yield _conv(stat)
       end
     end
   end
@@ -132,6 +156,7 @@ module Hdfs
   module_function :set_permission
   module_function :set_owner
   module_function :list
+  module_function :ls
 
   private
   def _path(path)
@@ -140,6 +165,19 @@ module Hdfs
     end
     Path.new(path)
   end
+  
+  def _conv(stat)
+    file_info = {}
+    file_info['path'] = stat.getPath.to_s
+    file_info['length'] = stat.getLen.to_i
+    file_info['modificationTime'] = stat.getModificationTime.to_i
+    file_info['owner'] = stat.getOwner.to_s
+    file_info['group'] = stat.getGroup.to_s
+    file_info['permission'] = stat.getPermission.toShort.to_i
+    file_info['type'] = !stat.isDir ? 'FILE': 'DIRECTORY'
+    return file_info
+  end
 
   module_function :_path
+  module_function :_conv
 end

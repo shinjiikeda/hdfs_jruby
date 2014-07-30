@@ -1,8 +1,10 @@
 
 require 'hdfs_jruby'
 
-Hdfs.list(ARGV[0], true) do | stat |
-  p stat
+list = Hdfs.ls(ARGV[0]) 
+
+list.each do |stat|
+  #p stat
   path = stat['path']
   length = stat['length']
   type = stat['type']
