@@ -18,7 +18,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+   require 'hdfs_jruby'
+   
+   ...
+
+   Hdfs.ls(path) do | stat |
+     p stat
+   end
+
 
 ## Contributing
 
