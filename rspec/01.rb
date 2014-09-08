@@ -10,6 +10,7 @@ HDFS_TMP_DIR="./test_rspec.#{$$}"
 puts "hdfs tmpdir: #{HDFS_TMP_DIR}"
 
 describe "test1" do
+  
   before(:all) do
     Hdfs.mkdir(HDFS_TMP_DIR)
   end
