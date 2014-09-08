@@ -16,7 +16,7 @@ describe "test1" do
     Hdfs.put("./rspec/test_data", HDFS_TMP_DIR)
   end
   
-  it "ls #{HDFS_TMP_DIR}/test_data" do
+  it "ls #{HDFS_TMP_DIR}/test_data use block" do
     cnt = 0
     Hdfs.ls("#{HDFS_TMP_DIR}/test_data").each do | stat |
       #p stat
@@ -24,7 +24,7 @@ describe "test1" do
     end
     expect(cnt).to eq 3
   end
-  it "ls #{HDFS_TMP_DIR}/test_data use block" do
+  it "ls #{HDFS_TMP_DIR}/test_data" do
     r = Hdfs.ls("#{HDFS_TMP_DIR}/test_data")
     expect(r.size).to eq 3
   end
