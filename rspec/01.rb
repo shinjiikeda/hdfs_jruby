@@ -9,6 +9,7 @@ require 'hdfs_jruby/file'
 HDFS_TMP_DIR="./test_rspec.$$"
 
 describe "test1" do
+  
   before(:all) do
     Hdfs.mkdir(HDFS_TMP_DIR)
   end
