@@ -6,7 +6,8 @@ require 'rspec'
 require 'hdfs_jruby'
 require 'hdfs_jruby/file'
 
-HDFS_TMP_DIR="./test_rspec.$$"
+HDFS_TMP_DIR="./test_rspec.#{$$}"
+puts "hdfs tmpdir: #{HDFS_TMP_DIR}"
 
 describe "test1" do
   before(:all) do
@@ -62,7 +63,21 @@ describe "test1" do
     end
     expect(content).to eq "d/a\n"
   end
-
+  
+  it "create #{HDFS_TMP_DIR}/test_data/append_test/test.txt" do
+    Hdfs::File.open("#{HDFS_TMP_DIR}/test_data/append_test/test.txt", "a") do |io|
+      io.puts("1")
+    end
+    Hdfs::File.open("#{HDFS_TMP_DIR}/test_data/append_test/test.txt", "a") do |io|
+      io.puts("2")
+    end
+    content = nil
+    Hdfs::File.open("#{HDFS_TMP_DIR}/test_data/append_test/test.txt", "r") do |io|
+      content = io.read
+    end
+    expect(content).to eq "1\n2\n"
+  end
+  
   it "delete not empty directory" do
     begin
       Hdfs.delete("#{HDFS_TMP_DIR}/test_data")
