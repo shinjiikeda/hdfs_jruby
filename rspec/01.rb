@@ -65,7 +65,7 @@ describe "test1" do
     expect(content).to eq "d/a\n"
   end
   
-  it "create #{HDFS_TMP_DIR}/test_data/append_test/test.txt" do
+  it "append #{HDFS_TMP_DIR}/test_data/append_test/test.txt" do
     Hdfs::File.open("#{HDFS_TMP_DIR}/test_data/append_test/test.txt", "a") do |io|
       io.puts("1")
     end
