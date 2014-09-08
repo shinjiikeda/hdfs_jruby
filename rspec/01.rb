@@ -4,6 +4,7 @@ require 'rubygems'
 require 'rspec'
 
 require 'hdfs_jruby'
+require 'hdfs_jruby/file'
 
 HDFS_TMP_DIR="./test_rspec.$$"
 
@@ -42,7 +43,46 @@ describe "test1" do
     r = Hdfs.file?("#{HDFS_TMP_DIR}/test_data/a/a/test.txt")
     expect(r).to eq true
   end
+  
+  it "size #{HDFS_TMP_DIR}/test_data/a/a/test.txt" do
+    size = Hdfs.size("#{HDFS_TMP_DIR}/test_data/a/a/test.txt")
+    expect(size).to eq 4
+  end
+  
+  it "create #{HDFS_TMP_DIR}/test_data/d/a/test.txt" do
+    Hdfs::File.open("#{HDFS_TMP_DIR}/test_data/d/a/test.txt", "w") do |io|
+      io.puts("d/a")
+    end
+  end
+  
+  it "read #{HDFS_TMP_DIR}/test_data/d/a/test.txt" do
+    content = nil
+    Hdfs::File.open("#{HDFS_TMP_DIR}/test_data/d/a/test.txt", "r") do |io|
+      content = io.read
+    end
+    expect(content).to eq "d/a\n"
+  end
 
+  it "delete not empty directory" do
+    begin
+      Hdfs.delete("#{HDFS_TMP_DIR}/test_data")
+      r = false
+    rescue Java::OrgApacheHadoopIpc::RemoteException => e
+      if e.to_s =~ /is non empty/
+        r = true
+      else
+        r = false
+      end
+    rescue
+      r = false
+    end
+    expect(r).to eq true
+  end
+
+  it "delete directory" do
+    Hdfs.delete("#{HDFS_TMP_DIR}/test_data", true)
+  end
+  
   after(:all) do
     Hdfs.delete(HDFS_TMP_DIR, true)
   end
