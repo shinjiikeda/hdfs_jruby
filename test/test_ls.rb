@@ -1,7 +1,7 @@
 
 require 'hdfs_jruby'
 
-list = Hdfs.ls(ARGV[0]) 
+list = Hdfs.ls(ARGV[0])
 
 list.each do |stat|
   #p stat

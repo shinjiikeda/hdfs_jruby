@@ -33,8 +33,14 @@ module Hdfs
   class FsPermission < org.apache.hadoop.fs.permission.FsPermission
   end
   
-  @conf = Hdfs::Configuration.new()
+  @conf = Hdfs::Configuration.new
   @fs = Hdfs::FileSystem.get(@conf)
+  
+  def connectAsUser(user)
+    uri =  Hdfs::FileSystem.getDefaultUri(@conf)
+    @fs.close if ! @fs.nil?
+    @fs = Hdfs::FileSystem.get(uri, @conf, user)
+  end
   
   def ls(path)
     p = _path(path)
@@ -157,6 +163,7 @@ module Hdfs
   module_function :set_owner
   module_function :list
   module_function :ls
+  module_function :connectAsUser
 
   private
   def _path(path)
@@ -180,4 +187,5 @@ module Hdfs
 
   module_function :_path
   module_function :_conv
+
 end
