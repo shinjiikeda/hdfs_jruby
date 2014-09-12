@@ -17,6 +17,9 @@ Or install it yourself as:
     $ gem install hdfs_jruby
 
 ## Usage
+http://rubydoc.info/gems/hdfs_jruby/0.0.7/frames
+
+Example
 
     require 'hdfs_jruby'
     
