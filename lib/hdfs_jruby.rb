@@ -45,10 +45,14 @@ module Hdfs
   def ls(path)
     p = _path(path)
     list = @fs.globStatus(p)
+    return [] if list.nil?
+
     ret_list = []
     list.each do |stat|
       if stat.isDir
         sub_list = @fs.listStatus(stat.getPath)
+        next if sub_list.nil?
+        
         sub_list.each do | s |
           if block_given?
             yield _conv(s)
