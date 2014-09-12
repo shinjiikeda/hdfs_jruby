@@ -31,15 +31,19 @@ module Hdfs
     raise "HADOOP_HOME is not set!"
   end
   
+  # @private
   class FileSystem < org.apache.hadoop.fs.FileSystem
   end
   
+  # @private
   class Configuration < org.apache.hadoop.conf.Configuration
   end
-
+  
+  # @private
   class Path < org.apache.hadoop.fs.Path
   end
-
+  
+  # @private
   class FsPermission < org.apache.hadoop.fs.permission.FsPermission
   end
   
@@ -55,7 +59,16 @@ module Hdfs
   
   # ls
   # @param [String] path 
-  # @return [Array] match path list
+  # @return [Array] file status array
+  #
+  # @note file status:
+  #              path
+  #              length
+  #              modificationTime
+  #              owner
+  #              group
+  #              permission
+  #              type
   def ls(path)
     p = _path(path)
     list = @fs.globStatus(p)
@@ -164,24 +177,29 @@ module Hdfs
     @fs.copyToLocalFile(Path.new(remote), Path.new(local))
   end
   
+  # get home directory
   def get_home_directory()
     @fs.getHomeDirectory()
   end
   
+  # get working directory
   def get_working_directory()
     @fs.getWorkingDirectory()
   end
-
+  
+  # set working directory
   def set_working_directory(path)
     @fs.setWorkingDirectory(_path())
   end
   
+  # set permission
   # @param [String] path
   # @param [Integer] perm permission
   def set_permission(path, perm)
     @fs.setPermission(_path(path), org.apache.hadoop.fs.permission.FsPermission.new(perm))
   end
   
+  # set owner & group
   # @param [String] path
   # @param [String] owner
   # @param [String] group
@@ -208,6 +226,8 @@ module Hdfs
   module_function :connectAsUser
 
   private
+  
+  # @private
   def _path(path)
     if path.nil?
       raise "path is nil"
@@ -215,6 +235,7 @@ module Hdfs
     Path.new(path)
   end
   
+  # @private
   def _conv(stat)
     file_info = {}
     file_info['path'] = stat.getPath.to_s
