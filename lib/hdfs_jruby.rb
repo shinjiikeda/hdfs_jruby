@@ -42,12 +42,16 @@ module Hdfs
   @conf = Hdfs::Configuration.new
   @fs = Hdfs::FileSystem.get(@conf)
   
+  # @private
   def connectAsUser(user)
     uri =  Hdfs::FileSystem.getDefaultUri(@conf)
     @fs.close if ! @fs.nil?
     @fs = Hdfs::FileSystem.get(uri, @conf, user)
   end
   
+  # ls
+  # @param [String] path 
+  # @return [Array] match path list
   def ls(path)
     p = _path(path)
     list = @fs.globStatus(p)
@@ -76,7 +80,8 @@ module Hdfs
     end
     ret_list if ! block_given?
   end
-
+  
+  # @private
   def list(path, opts={})
     use_glob = opts[:glob] ? true : false
     p = _path(path)
@@ -101,38 +106,56 @@ module Hdfs
     end
   end
   
+  # @param [String] path
   def exists?(path)
     @fs.exists(_path(path))
   end
-
+  
+  # @param [String] hdfs source path
+  # @param [String] hdfs destination path
   def move(src, dst)
     @fs.rename(Path.new(src), Path.new(dst))
   end
-
+  
+  # delete
+  #
+  # @param [String] path
+  # @param [Boolean] r recursive false or true (default: false)
   def delete(path, r=false)
     @fs.delete(_path(path), r)
   end
-
+  
+  # @return [Boolean] true: file, false: directory
   def file?(path)
     @fs.isFile(_path(path))
   end
 
+  # @return [Boolean] true: directory, false: file
   def directory?(path)
     @fs.isDirectory(_path(path))
   end
-
+  
+  # @return [Integer] file size
   def size(path)
     @fs.getFileStatus(_path(path)).getLen()
   end
   
+  # make directory
+  # @param [String] path
   def mkdir(path)
     @fs.mkdirs(_path(path))
   end
-
+  
+  # put file or directory to hdfs
+  # @param [String] surouce (local path)
+  # @param [String] destination (hdfs path)
   def put(local, remote)
     @fs.copyFromLocalFile(Path.new(local), Path.new(remote))
   end
 
+  # get file or directory from hdfs
+  # @param [String] surouce (hdfs path)
+  # @param [String] destination (local path)
   def get(remote, local)
     @fs.copyToLocalFile(Path.new(remote), Path.new(local))
   end
@@ -148,11 +171,16 @@ module Hdfs
   def set_working_directory(path)
     @fs.setWorkingDirectory(_path())
   end
-
+  
+  # @param [String] path
+  # @param [Integer] permission
   def set_permission(path, perm)
     @fs.setPermission(_path(path), org.apache.hadoop.fs.permission.FsPermission.new(perm))
   end
   
+  # @param [String] path
+  # @param [String] owner
+  # @param [String] group
   def set_owner(path, owner, group)
     @fs.setOwner(_path(path), owner, group)
   end

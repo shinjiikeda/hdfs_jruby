@@ -7,6 +7,9 @@ module Hdfs
   import java.lang.String
 
   class File < Delegator
+    
+    # @param [String] path
+    # @param [String] mode 'r' or 'w' or 'a'
     def initialize(path, mode = "r")
       @conf = Hdfs::Configuration.new()
       @fs = Hdfs::FileSystem.get(@conf)
@@ -29,6 +32,8 @@ module Hdfs
       end
     end
     
+    # @param [String] path
+    # @param [String] mode 'r' or 'w' or 'a' 
     def self.open(path, mode = "r")
       if block_given?
         io = File.new(path, mode).to_io
