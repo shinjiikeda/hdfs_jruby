@@ -11,6 +11,10 @@ module Hdfs
     warn "only for use with JRuby"
   end
   
+  if ! ENV["HADOOP_HOME"] && File.exists?("/usr/lib/hadoop")
+    ENV["HADOOP_HOME"] = "/usr/lib/hadoop"
+  end
+  
   if ENV["HADOOP_HOME"]
     HADOOP_HOME=ENV["HADOOP_HOME"]
     Dir["#{HADOOP_HOME}/#{JAR_PATTERN_0_20}",
@@ -29,13 +33,13 @@ module Hdfs
   
   class FileSystem < org.apache.hadoop.fs.FileSystem
   end
-
+  
   class Configuration < org.apache.hadoop.conf.Configuration
   end
 
   class Path < org.apache.hadoop.fs.Path
   end
-  
+
   class FsPermission < org.apache.hadoop.fs.permission.FsPermission
   end
   
