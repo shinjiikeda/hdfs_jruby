@@ -9,7 +9,7 @@ module Hdfs
   class File < Delegator
     
     # @param [String] path
-    # @param [String] mode 'r' or 'w' or 'a'
+    # @param [String] mode 'r' read,  'w' write, 'a': apeend
     def initialize(path, mode = "r")
       @conf = Hdfs::Configuration.new()
       @fs = Hdfs::FileSystem.get(@conf)
@@ -32,8 +32,17 @@ module Hdfs
       end
     end
     
+    # @example
+    #  Hdfs::File.open("hoge.txt", "r") do | io |
+    #    ...
+    #  end
+    #  
+    #  Hdfs::File.open("hoge.txt", "r").each do | line |
+    #    puts line
+    #  end
+    #
     # @param [String] path
-    # @param [String] mode 'r' or 'w' or 'a' 
+    # @param [String] mode 'r' read,  'w' write, 'a': apeend 
     def self.open(path, mode = "r")
       if block_given?
         io = File.new(path, mode).to_io
@@ -62,6 +71,7 @@ module Hdfs
       outbuf << java.lang.String.new(buf, 0, n).to_s
     end
     
+    # @private
     def seek(offset, whence = IO::SEEK_SET)
       @stream.seek(offset)
       0
@@ -71,11 +81,13 @@ module Hdfs
       @stream.close
       @fs.close
     end
-
+    
+    # @private
     def __getobj__
       @stream
     end
-
+    
+    # @private
     def __setobj__(obj)
       @stream = obj
     end

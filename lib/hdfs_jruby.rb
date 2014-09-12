@@ -58,6 +58,10 @@ module Hdfs
   end
   
   # ls
+  # @example
+  #   Hdfs.ls("hoge/").each do | stat |
+  #     p stat
+  #   end
   # @param [String] path 
   # @return [Array] file status array
   #
