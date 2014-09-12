@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Hdfs::VERSION
   spec.authors       = ["shinji ikeda"]
   spec.email         = ["gm.ikeda@gmail.com"]
-  spec.summary       = %q{ jruby hdfs api}
+  spec.summary       = %q{ Hadoop hdfs api for JRuby}
   spec.description   = %q{}
   spec.homepage      = "https://github.com/shinjiikeda/hdfs_jruby"
   spec.license       = "MIT"
