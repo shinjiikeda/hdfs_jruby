@@ -16,7 +16,7 @@ describe "test1" do
   end
   
   it "put test_dir" do
-    Hdfs.put("./rspec/test_data", HDFS_TMP_DIR)
+    Hdfs.put("./spec/test_data", HDFS_TMP_DIR)
   end
   
   it "ls #{HDFS_TMP_DIR}/test_data use block" do
