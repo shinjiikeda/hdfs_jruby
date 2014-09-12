@@ -111,8 +111,8 @@ module Hdfs
     @fs.exists(_path(path))
   end
   
-  # @param [String] hdfs source path
-  # @param [String] hdfs destination path
+  # @param [String] src hdfs source path
+  # @param [String] dst hdfs destination path
   def move(src, dst)
     @fs.rename(Path.new(src), Path.new(dst))
   end
@@ -147,15 +147,15 @@ module Hdfs
   end
   
   # put file or directory to hdfs
-  # @param [String] surouce (local path)
-  # @param [String] destination (hdfs path)
+  # @param [String] local surouce (local path)
+  # @param [String] remote destination (hdfs path)
   def put(local, remote)
     @fs.copyFromLocalFile(Path.new(local), Path.new(remote))
   end
 
   # get file or directory from hdfs
-  # @param [String] surouce (hdfs path)
-  # @param [String] destination (local path)
+  # @param [String] remote surouce (hdfs path)
+  # @param [String] local destination (local path)
   def get(remote, local)
     @fs.copyToLocalFile(Path.new(remote), Path.new(local))
   end
@@ -173,7 +173,7 @@ module Hdfs
   end
   
   # @param [String] path
-  # @param [Integer] permission
+  # @param [Integer] perm permission
   def set_permission(path, perm)
     @fs.setPermission(_path(path), org.apache.hadoop.fs.permission.FsPermission.new(perm))
   end
