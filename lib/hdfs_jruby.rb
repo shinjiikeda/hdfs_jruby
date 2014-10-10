@@ -113,6 +113,7 @@ module Hdfs
     else
       list = @fs.listStatus(p)
     end
+    return [] if list.nil?
       
     if ! block_given?
       ret_list = []
