@@ -11,9 +11,10 @@ module Hdfs
     # @param [String] path
     # @param [String] mode 'r' read,  'w' write, 'a': apeend
     def initialize(path, mode = "r")
-      @conf = Hdfs::Configuration.new()
-      @fs = Hdfs::FileSystem.get(@conf)
-
+      #@conf = Hdfs::Configuration.new()
+      #@fs = Hdfs::FileSystem.get(@conf)
+      @fs = Hdfs.get_fs()
+      
       @mode = mode
       if mode == "w"
         @stream = @fs.create(Hdfs::Path.new(path), false)

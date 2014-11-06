@@ -212,6 +212,10 @@ module Hdfs
     @fs.setOwner(_path(path), owner, group)
   end
   
+  def get_fs
+    @fs
+  end
+   
   module_function :exists?
   module_function :move
   module_function :mkdir
@@ -229,6 +233,7 @@ module Hdfs
   module_function :list
   module_function :ls
   module_function :connectAsUser
+  module_function :get_fs
 
   private
   
