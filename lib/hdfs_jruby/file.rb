@@ -50,7 +50,10 @@ module Hdfs
         begin
           yield(io)
         ensure
-          io.close
+          begin
+            io.close
+          rescue
+          end
         end
       else
         return File.new(path, mode).to_io
