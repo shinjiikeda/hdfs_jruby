@@ -4,7 +4,7 @@ require "hdfs_jruby/version"
 module Hdfs
 
   JAR_PATTERN_0_20="hadoop-core-*.jar"
-  
+   
   if RUBY_PLATFORM =~ /java/
     include Java
   else
@@ -19,6 +19,7 @@ module Hdfs
     HADOOP_HOME=ENV["HADOOP_HOME"]
     Dir["#{HADOOP_HOME}/#{JAR_PATTERN_0_20}",
         "#{HADOOP_HOME}/lib/*.jar",
+        "#{HADOOP_HOME}/client/*.jar",
         "#{HADOOP_HOME}/share/hadoop/common/*.jar",
         "#{HADOOP_HOME}/share/hadoop/common/lib/*.jar",
         "#{HADOOP_HOME}/share/hadoop/hdfs/*.jar",
@@ -27,6 +28,7 @@ module Hdfs
       require jar
     end
     $CLASSPATH << "#{HADOOP_HOME}/conf"
+    $CLASSPATH << "/etc/hadoop/conf"
   else
     raise "HADOOP_HOME is not set!"
   end
