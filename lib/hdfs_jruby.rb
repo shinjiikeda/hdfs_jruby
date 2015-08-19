@@ -34,7 +34,8 @@ module Hdfs
   end
   
   # @private
-  class FileSystem < org.apache.hadoop.fs.FileSystem
+  ## class FileSystem < org.apache.hadoop.fs.FileSystem
+  class FileSystem < org.apache.hadoop.fs.s3native.NativeS3FileSystem
   end
   
   # @private
