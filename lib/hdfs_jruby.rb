@@ -34,8 +34,7 @@ module Hdfs
   end
   
   # @private
-  ## class FileSystem < org.apache.hadoop.fs.FileSystem
-  class FileSystem < org.apache.hadoop.fs.s3native.NativeS3FileSystem
+  class FileSystem < org.apache.hadoop.fs.FileSystem
   end
   
   # @private
@@ -53,6 +52,7 @@ module Hdfs
   @conf = Hdfs::Configuration.new
   @fs = Hdfs::FileSystem.get(@conf)
   
+  @fs_cache = {}
   # @private
   def connectAsUser(user)
     uri =  Hdfs::FileSystem.getDefaultUri(@conf)
@@ -60,6 +60,22 @@ module Hdfs
     @fs = Hdfs::FileSystem.get(uri, @conf, user)
   end
   
+  def get_fs(path)
+    uri = URI.parse(path)
+    key = uri.schema + '://' + uri.host
+    if uri.scheme.nil? || @fs.getUri(@conf).to_s == key
+      return @fs
+    end
+
+    if @fs_cache.has_key?(key)
+      return @fs_cache[key]
+    else
+      fs = Hdfs::FileSystem.get(java.net.URI.new(key), @conf)
+      @fs_cache[key] = fs
+      return fs
+    end
+  end
+
   # ls
   # @example
   #   Hdfs.ls("hoge/").each do | stat |
@@ -77,14 +93,15 @@ module Hdfs
   #              permission
   #              type
   def ls(path)
+    fs = get_fs(path)
     p = _path(path)
-    list = @fs.globStatus(p)
+    list = fs.globStatus(p)
     return [] if list.nil?
 
     ret_list = []
     list.each do |stat|
       if stat.isDir
-        sub_list = @fs.listStatus(stat.getPath)
+        sub_list = fs.listStatus(stat.getPath)
         next if sub_list.nil?
         
         sub_list.each do | s |
@@ -107,14 +124,15 @@ module Hdfs
   
   # @private
   def list(path, opts={})
+    fs = get_fs(path)
     use_glob = opts[:glob] ? true : false
     p = _path(path)
 
     list = nil
     if use_glob
-      list = @fs.globStatus(p)
+      list = fs.globStatus(p)
     else
-      list = @fs.listStatus(p)
+      list = fs.listStatus(p)
     end
     return [] if list.nil?
       
@@ -133,13 +151,15 @@ module Hdfs
   
   # @param [String] path
   def exists?(path)
-    @fs.exists(_path(path))
+    fs = get_fs(path)
+    fs.exists(_path(path))
   end
   
   # @param [String] src hdfs source path
   # @param [String] dst hdfs destination path
   def move(src, dst)
-    @fs.rename(Path.new(src), Path.new(dst))
+    fs = get_fs(src)
+    fs.rename(Path.new(src), Path.new(dst))
   end
   
   # delete
@@ -147,42 +167,49 @@ module Hdfs
   # @param [String] path
   # @param [Boolean] r recursive false or true (default: false)
   def delete(path, r=false)
-    @fs.delete(_path(path), r)
+    fs = get_fs(path)
+    fs.delete(_path(path), r)
   end
   
   # @return [Boolean] true: file, false: directory
   def file?(path)
-    @fs.isFile(_path(path))
+    fs = get_fs(path)
+    fs.isFile(_path(path))
   end
 
   # @return [Boolean] true: directory, false: file
   def directory?(path)
-    @fs.isDirectory(_path(path))
+    fs = get_fs(path)
+    fs.isDirectory(_path(path))
   end
   
   # @return [Integer] file size
   def size(path)
-    @fs.getFileStatus(_path(path)).getLen()
+    fs = get_fs(path)
+    fs.getFileStatus(_path(path)).getLen()
   end
   
   # make directory
   # @param [String] path
   def mkdir(path)
-    @fs.mkdirs(_path(path))
+    fs = get_fs(path)
+    fs.mkdirs(_path(path))
   end
   
   # put file or directory to hdfs
   # @param [String] local surouce (local path)
   # @param [String] remote destination (hdfs path)
   def put(local, remote)
-    @fs.copyFromLocalFile(Path.new(local), Path.new(remote))
+    fs = get_fs(remote)
+    fs.copyFromLocalFile(Path.new(local), Path.new(remote))
   end
 
   # get file or directory from hdfs
   # @param [String] remote surouce (hdfs path)
   # @param [String] local destination (local path)
   def get(remote, local)
-    @fs.copyToLocalFile(Path.new(remote), Path.new(local))
+    fs = get_fs(remote)
+    fs.copyToLocalFile(Path.new(remote), Path.new(local))
   end
   
   # get home directory
