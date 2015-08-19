@@ -60,22 +60,6 @@ module Hdfs
     @fs = Hdfs::FileSystem.get(uri, @conf, user)
   end
   
-  def get_fs(path)
-    uri = URI.parse(path)
-    key = uri.schema + '://' + uri.host
-    if uri.scheme.nil? || @fs.getUri(@conf).to_s == key
-      return @fs
-    end
-
-    if @fs_cache.has_key?(key)
-      return @fs_cache[key]
-    else
-      fs = Hdfs::FileSystem.get(java.net.URI.new(key), @conf)
-      @fs_cache[key] = fs
-      return fs
-    end
-  end
-
   # ls
   # @example
   #   Hdfs.ls("hoge/").each do | stat |
@@ -93,7 +77,7 @@ module Hdfs
   #              permission
   #              type
   def ls(path)
-    fs = get_fs(path)
+    fs = _get_fs(path)
     p = _path(path)
     list = fs.globStatus(p)
     return [] if list.nil?
@@ -124,7 +108,7 @@ module Hdfs
   
   # @private
   def list(path, opts={})
-    fs = get_fs(path)
+    fs = _get_fs(path)
     use_glob = opts[:glob] ? true : false
     p = _path(path)
 
@@ -151,14 +135,14 @@ module Hdfs
   
   # @param [String] path
   def exists?(path)
-    fs = get_fs(path)
+    fs = _get_fs(path)
     fs.exists(_path(path))
   end
   
   # @param [String] src hdfs source path
   # @param [String] dst hdfs destination path
   def move(src, dst)
-    fs = get_fs(src)
+    fs = _get_fs(src)
     fs.rename(Path.new(src), Path.new(dst))
   end
   
@@ -167,32 +151,32 @@ module Hdfs
   # @param [String] path
   # @param [Boolean] r recursive false or true (default: false)
   def delete(path, r=false)
-    fs = get_fs(path)
+    fs = _get_fs(path)
     fs.delete(_path(path), r)
   end
   
   # @return [Boolean] true: file, false: directory
   def file?(path)
-    fs = get_fs(path)
+    fs = _get_fs(path)
     fs.isFile(_path(path))
   end
 
   # @return [Boolean] true: directory, false: file
   def directory?(path)
-    fs = get_fs(path)
+    fs = _get_fs(path)
     fs.isDirectory(_path(path))
   end
   
   # @return [Integer] file size
   def size(path)
-    fs = get_fs(path)
+    fs = _get_fs(path)
     fs.getFileStatus(_path(path)).getLen()
   end
   
   # make directory
   # @param [String] path
   def mkdir(path)
-    fs = get_fs(path)
+    fs = _get_fs(path)
     fs.mkdirs(_path(path))
   end
   
@@ -200,7 +184,7 @@ module Hdfs
   # @param [String] local surouce (local path)
   # @param [String] remote destination (hdfs path)
   def put(local, remote)
-    fs = get_fs(remote)
+    fs = _get_fs(remote)
     fs.copyFromLocalFile(Path.new(local), Path.new(remote))
   end
 
@@ -208,7 +192,7 @@ module Hdfs
   # @param [String] remote surouce (hdfs path)
   # @param [String] local destination (local path)
   def get(remote, local)
-    fs = get_fs(remote)
+    fs = _get_fs(remote)
     fs.copyToLocalFile(Path.new(remote), Path.new(local))
   end
   
@@ -288,7 +272,27 @@ module Hdfs
     return file_info
   end
 
+  # @private
+  def _get_fs(path)
+    uri = URI.parse(path)
+    return @fs if uri.scheme.nil?
+
+    key = uri.scheme + '://' + uri.host
+    if @fs.getUri().to_s == key
+      return @fs
+    end
+
+    if @fs_cache.has_key?(key)
+      return @fs_cache[key]
+    else
+      fs = Hdfs::FileSystem.get(java.net.URI.new(key), @conf)
+      @fs_cache[key] = fs
+      return fs
+    end
+  end
+
   module_function :_path
   module_function :_conv
+  module_function :_get_fs
 
 end
