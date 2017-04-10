@@ -17,14 +17,7 @@ module Hdfs
   
   if ENV["HADOOP_HOME"]
     HADOOP_HOME=ENV["HADOOP_HOME"]
-    Dir["#{HADOOP_HOME}/#{JAR_PATTERN_0_20}",
-        "#{HADOOP_HOME}/lib/*.jar",
-        "#{HADOOP_HOME}/client/*.jar",
-        "#{HADOOP_HOME}/share/hadoop/common/*.jar",
-        "#{HADOOP_HOME}/share/hadoop/common/lib/*.jar",
-        "#{HADOOP_HOME}/share/hadoop/hdfs/*.jar",
-        "#{HADOOP_HOME}/share/hadoop/hdfs/lib/*.jar"
-        ].each  do |jar|
+    Dir["#{HADOOP_HOME}/*.jar", "#{HADOOP_HOME}/**/*.jar"].each do |jar|
       if File.symlink?(jar)
         link = File.readlink(jar)
         abs_path = File.expand_path(link, File.dirname(jar))
