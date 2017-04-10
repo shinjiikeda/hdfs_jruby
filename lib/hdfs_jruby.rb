@@ -25,6 +25,11 @@ module Hdfs
         "#{HADOOP_HOME}/share/hadoop/hdfs/*.jar",
         "#{HADOOP_HOME}/share/hadoop/hdfs/lib/*.jar"
         ].each  do |jar|
+      if File.symlink?(jar)
+        link = File.readlink(jar)
+        abs_path = File.expand_path(link, File.dirname(jar))
+        next unless File.exist?(abs_path)
+      end
       require jar
     end
     $CLASSPATH << "#{HADOOP_HOME}/conf"
